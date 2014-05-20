@@ -12,7 +12,24 @@
  * MIT Licensed
  */
 
-(function () {
+(function(root, factory) {
+
+  // Set up Backbone appropriately for the environment. Start with AMD.
+  if (typeof define === 'function' && define.amd) {
+    define(['backbone'], function(Backbone) {
+      factory(root, Backbone);
+    });
+
+  // Next for Node.js or CommonJS. jQuery may not be needed as a module.
+  } else if (typeof exports !== 'undefined') {
+    factory(root, require('backbone'));
+
+  // Finally, as a browser global.
+  } else {
+    factory(root, root.Backbone);
+  }
+
+}(this, function(root, Backbone) {
 
 
 	// The active `socket`
@@ -26,7 +43,7 @@
 
 
 	// Used to simplify app-level connection logic-- i.e. so you don't
-	// have to wait for the socket to be connected to start trying to 
+	// have to wait for the socket to be connected to start trying to
 	// synchronize data.
 	var requestQueue = [];
 
@@ -76,7 +93,7 @@
 
 
 		if (socketIsConnected) {
-			
+
 			// Run the request queue
 			_.each(requestQueue, function (request) {
 				Backbone.sync(request.method, request.model, request.options);
@@ -139,7 +156,7 @@
 	 * Since Backbone is already a listener (extends Backbone.Events)
 	 * all we have to do is trigger the event on the Backbone global when
 	 * we receive a new message from the server.
-	 * 
+	 *
 	 * I realize this doesn't do a whole lot right now-- that's ok.
 	 * Let's start light and layer on additional functionality carefully.
 	 */
@@ -192,7 +209,7 @@
 
 
 		// Ensures the socket is connected and able to communicate w/ the server.
-		// 
+		//
 		var socketIsConnected = socket.socket && socket.socket.connected;
 		if ( !socketIsConnected ) {
 
@@ -238,7 +255,7 @@
 		if (options.patch === true && _.isObject(options.data) && options.data.id === null && model) {
 			params.id = model.id;
 		}
-		
+
 		if (_.isObject(options.data)) {
 			_(params).extend(options.data);
 		}
@@ -263,7 +280,7 @@
 
 
 		// Send a simulated HTTP request to Sails via Socket.io
-		var simulatedXHR = 
+		var simulatedXHR =
 			socket.request(url, params, function serverResponded ( response ) {
 				if (options.success) options.success(response);
 			}, verb);
@@ -274,7 +291,7 @@
     model.trigger('request', model, simulatedXHR, options);
 
 
-    
+
 		return simulatedXHR;
 	};
 
@@ -283,14 +300,14 @@
 
 
 
-		
+
 
 
 
 
 	/**
 	 * TODO:
-	 * Replace sails.io.js with `jQuery-to-sails.js`, which can be a prerequisite of 
+	 * Replace sails.io.js with `jQuery-to-sails.js`, which can be a prerequisite of
 	 * this SDK.
 	 *
 	 * Will allow for better client-side error handling, proper simulation of $.ajax,
@@ -329,4 +346,4 @@
 	*/
 
 
-})();
+}));
