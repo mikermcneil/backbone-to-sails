@@ -251,12 +251,16 @@ sending an HTTP request.
 
 
 ###### Listening to the Server
-> i.e. What happens when comet messages arrive?
+> i.e. What happens when messages arrive?
 
 When your Sails publishes a message using `Foo.publish`, the name of
-the socket event is always 'message'. This SDK examines all incoming
-messages from Sails, then triggers a `comet` event on the `Backbone` 
-global.
+the socket event is always the name of the Model - in this case 'foo'.
+If you provide socket callbacks, you'll receive messages about the
+model Foo on the 'foo' channel. If you don't provide callbacks, all
+incoming messages will be sent to the 'comet' channel.
+
+This SDK examines all incoming messages from Sails, then triggers the 
+appropriate event ('foo' vs. 'comet') on the `Backbone` global.
 
 
 
