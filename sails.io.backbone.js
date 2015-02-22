@@ -50,12 +50,12 @@
 		if (socket) return;
 
 		if (Backbone.socket) {
-			socket = Backbone.socket;
-			socketSrc = '`Backbone.socket`';
+			socket = Backbone.io.socket;
+			socketSrc = '`Backbone.io.socket`';
 		}
-		else if (window.socket) {
-			socket = window.socket;
-			socketSrc = '`window.socket`';
+		else if (window.io.socket) {
+			socket = window.io.socket;
+			socketSrc = '`window.io.socket`';
 		}
 
 		// The first time a socket is acquired, bind comet listener
@@ -72,7 +72,7 @@
 		clearTimeout(socketTimer);
 
 		// Check if socket is connected (synchronous)
-		var socketIsConnected = socket.socket && socket.socket.connected;
+		var socketIsConnected = socket && socket.isConnected();
 
 
 		if (socketIsConnected) {
@@ -97,7 +97,7 @@
 			// 	'but its `connected` property is still set to false.\n' +
 			// 	'But maybe Socket.io just hasn\'t finished connecting yet?\n' +
 			// 	'\n' +
-			// 	'You might check to be sure you\'re waiting for `socket.on(\'connect\')`\n' +
+			// 	'You might check to be sure you\'re waiting for `io.socket.on(\'connect\')`\n' +
 			// 	'before using sync methods on your Backbone models and collections.'
 			// );
 		}
@@ -114,7 +114,7 @@
 
 
 	var _attemptToAcquireSocket = function () {
-		if ( socket ) return;
+		if ( io.socket ) return;
 		attempts++;
 		_acquireSocket();
 		if (attempts >= maxAttempts) return;
@@ -144,7 +144,7 @@
 	 * Let's start light and layer on additional functionality carefully.
 	 */
 	var _bindCometListener = function socketAcquiredForFirstTime () {
-		socket.on('message', function cometMessageReceived (message) {
+		io.socket.on('message', function cometMessageReceived (message) {
 			Backbone.trigger('comet', message);
 		});
 	};
@@ -179,7 +179,7 @@
 
 
 		// Handle missing socket
-		if (!socket) {
+		if (!io.socket) {
 			throw new Error(
 				'\n' +
 				'Backbone cannot find a suitable `socket` object.\n' +
@@ -193,7 +193,7 @@
 
 		// Ensures the socket is connected and able to communicate w/ the server.
 		// 
-		var socketIsConnected = socket.socket && socket.socket.connected;
+		var socketIsConnected = io.socket && io.socket.isConnected();
 		if ( !socketIsConnected ) {
 
 			// If the socket is not connected, the request is queued
@@ -261,12 +261,18 @@
 		}
 
 
+		var requestOpts = {
+			method: verb,
+			url: url,
+			params: params,
+			headers: {}
+		};
 
 		// Send a simulated HTTP request to Sails via Socket.io
 		var simulatedXHR = 
-			socket.request(url, params, function serverResponded ( response ) {
+			socket.request(requestOpts, function serverResponded ( response ) {
 				if (options.success) options.success(response);
-			}, verb);
+			});
 
 
 
