@@ -1,8 +1,13 @@
 backbone-to-sails
 =================
+![Version socket][socket-version] ![Build status][status]
+
+[socket-version]: https://img.shields.io/badge/socketio-1.x-blue.svg?style=flat-square
+[status]: https://img.shields.io/badge/status-testing-orange.svg?style=flat-square
 
 Backbone SDK for communicating with Sails.js over Socket.io.
 
+(Dirty patch)
 
 ### Background
 
