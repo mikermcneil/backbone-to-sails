@@ -5,19 +5,14 @@
  ******************************
  *
  * Developer: Milan Miljković
- * Phone: (+381) 61 663 2232
- * Mails: milan@designstorming.net
- *        milan.miljkovic@abc-cybernetics.com
- * Company: ABC Cybernetics
- * Project: Intelligent Control
- * Date Started: 24. Mar, 2015
- * Date Finished: 24. Mar, 2015
+ * Mail: milan@designstorming.net
  *
  * ***************************
  *
  * Ported from:
  *
  * c. 2013 @mikermcneil
+ * https://github.com/balderdashy/backbone-to-sails
  * Inspired by:
  * backbone.iobind - Backbone.sync replacement
  * Copyright(c) 2011 Jake Luer <jake@alogicalparadox.com>
