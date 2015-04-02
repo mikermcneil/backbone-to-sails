@@ -7,8 +7,6 @@ backbone-to-sails
 
 Backbone SDK for communicating with Sails.js over Socket.io.
 
-(Dirty patch)
-
 ### Background
 
 This has been a long time coming.

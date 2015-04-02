@@ -25,7 +25,7 @@
  ******************************
  */
 
-(function() {
+(function () {
 
 	// The active `socket`
 	var socket;
@@ -54,7 +54,7 @@
 	 *
 	 * @api private
 	 */
-	var _acquireSocket = function ( ) {
+	var _acquireSocket = function () {
 		if (socket) return;
 
 		if (Backbone.socket) {
@@ -73,7 +73,7 @@
 	 * Checks if the socket is ready- if so, runs the request queue.
 	 * If not, sets the timer again.
 	 */
-	var _keepTryingToRunRequestQueue = function ( ) {
+	var _keepTryingToRunRequestQueue = function () {
 		clearTimeout(socketTimer);
 
 		// Check if socket is connected (synchronous)
@@ -110,14 +110,14 @@
 
 
 	// Set up `async.until`-esque mechanism which will attempt to acquire a socket.
-	var attempts = 0,
-	    maxAttempts = 3,
-	    interval = 1500,
+	var attempts        = 0,
+	    maxAttempts     = 3,
+	    interval        = 1500,
 	    initialInterval = 250;
 
 
 	var _attemptToAcquireSocket = function () {
-		if ( socket ) return;
+		if (socket) return;
 		attempts++;
 		_acquireSocket();
 		if (attempts >= maxAttempts) return;
@@ -147,8 +147,6 @@
 		options = _.extend({}, options);
 
 
-
-
 		// If socket is not defined yet, try to grab it again.
 		_acquireSocket();
 
@@ -158,26 +156,25 @@
 			throw new Error(
 				'\n' +
 				'Backbone cannot find a suitable `socket` object.\n' +
-				'This SDK expects the active socket to be located at `window.socket`, '+
+				'This SDK expects the active socket to be located at `window.socket`, ' +
 				'`Backbone.socket` or the `socket` property\n' +
 				'of the Backbone model or collection attempting to communicate w/ the server.\n'
 			);
 		}
 
 
-
 		// Ensures the socket is connected and able to communicate w/ the server.
 		//
 		var socketIsConnected = socket() && socket().connected;
-		if ( !socketIsConnected ) {
+		if (!socketIsConnected) {
 
 
 
 			// If the socket is not connected, the request is queued
 			// (so it can be replayed when the socket comes online.)
 			requestQueue.push({
-				method: method,
-				model: model,
+				method:  method,
+				model:   model,
 				options: options
 			});
 
@@ -187,8 +184,6 @@
 
 			return;
 		}
-
-
 
 
 		// Get the actual URL (call `.url()` if it's a function)
@@ -206,7 +201,7 @@
 		// Build parameters to send to the server
 		var params = {};
 
-		if ( !options.data && model ) {
+		if (!options.data && model) {
 			params = options.attrs || model.toJSON(options) || {};
 		}
 
@@ -235,13 +230,21 @@
 		// Set current url for model handling
 		socket.sails.url = url;
 
-		// 02nd of April 2015 - Works w/ socket.io v
+		// 02nd of April 2015 - Works w/ socket.io v1.2.x
 		var simulatedXHR =
-			    socket.socket[verb](url, params, function serverResponded ( response ) {
-				    if(options.success) options.success(response);
+			    socket.socket.request({
+				    method: verb,
+				    url:    url,
+				    params: params
+			    }, function serverResponded(response) {
+				    if (options.success) options.success(response);
 			    });
 
 
+		// Old dirty patch
+		/*socket.socket[verb](url, params, function serverResponded(response) {
+			if (options.success) options.success(response);
+		});*/
 
 
 		// Send a simulated HTTP request to Sails via Socket.io
@@ -253,7 +256,6 @@
 
 		// Trigget the `request` event on the Backbone model
 		model.trigger('request', model, simulatedXHR, options);
-
 
 
 		return simulatedXHR;
